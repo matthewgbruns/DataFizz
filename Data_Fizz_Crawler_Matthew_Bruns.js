@@ -32,6 +32,7 @@ tester = function(baseweb, filters, count){
     console.log(baseweb);
     xhttp.open("GET", baseweb);
     xhttp.responseType = "document";
+    /*
     xhttp.onload = function () {
         if (xhttp.readyState === xhttp.DONE) {
             if (xhttp.status === 200) {
@@ -39,6 +40,7 @@ tester = function(baseweb, filters, count){
             }
         }
     };
+    */
     xhttp.send();
     xhttp.onload = function () {
         if (xhttp.readyState === xhttp.DONE) {
