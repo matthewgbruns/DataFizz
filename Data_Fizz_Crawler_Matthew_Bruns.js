@@ -58,7 +58,8 @@
                     var add = parser.getinfo(xhttp.responseText, baseweb[count], count);
                     array[count] = add;
                     if(count == 0){
-                        return array;
+                        console.log(JSON.stringify(array, undefined, 2));
+                        return;
                     }else{
                         return site_to_JSON(baseweb, count, array);
                     }
@@ -76,4 +77,11 @@ todo = function(site_array){
     var arr = [];
     site_to_JSON(site_array, site_array.length, arr) ;
 }
-sequentialStart();
+//sequentialStart();
+todo([
+    'https://www.amazon.com/Fahrenheit-451-Ray-Bradbury/dp/1451673310/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
+    'https://www.amazon.com/Brave-New-World-Aldous-Huxley/dp/0062696122/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
+    'https://www.amazon.com/Kill-Mockingbird-Slipcased-Harper-Lee/dp/0062428551/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
+    'https://www.amazon.com/Mice-Penguin-Great-Books-Century/dp/0812416317/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
+    'https://www.amazon.com/Lord-Flies-Penguin-Drop-Caps/dp/0143124293/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr='
+])
