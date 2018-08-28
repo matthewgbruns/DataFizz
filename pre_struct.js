@@ -34,13 +34,14 @@ module.exports = class Product {
         this.sourceURL = toSet;
     }
     set_all(toSet){
+        //id, name, listprice, description1, description2, product dimension, imageurls, weight, sourceurl
         this.id = toSet[0];
         this.name = toSet[1];
         this.listPrice = toSet[2];
-        this.description = toSet[3];
-        this.product_dimension = toSet[4];
-        this.imageURLs = toSet[5];
-        this.weight = toSet[6];
-        this.sourceURL = toSet[7];
+        this.product_dimension = toSet[3];
+        this.imageURLs = toSet[4];
+        this.weight = toSet[5];
+        this.sourceURL = toSet[6];
+        this.description = "No description found. Tough luck.";
     }
   }
