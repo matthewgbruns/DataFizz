@@ -10,7 +10,7 @@ module.exports = class Product {
     this.weight = "13.9 oz",
     this.sourceURL = "https://www.amazon.com/gp/product/1623155975/ref=s9_acsd_simh_bw_c_x_1_w?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-3&pf_rd_r=5S54Z6125KJDKW8DEBTV&pf_rd_r=5S54Z6125KJDKW8DEBTV&pf_rd_t=101&pf_rd_p=fe185ec9-c8f5-44c0-897e-4c0bde93268c&pf_rd_p=fe185ec9-c8f5-44c0-897e-4c0bde93268c&pf_rd_i=283155"
     }
-    //Helper functions if needed
+    //Helper functions if needed, most are not used
     set_id(toSet){
         this.id = toSet;
     }
@@ -36,7 +36,6 @@ module.exports = class Product {
         this.sourceURL = toSet;
     }
     set_all(toSet){
-        //id, name, listprice, description1, description2, product dimension, imageurls, weight, sourceurl
         this.id = toSet[0];
         this.name = toSet[1];
         this.listPrice = toSet[2];
@@ -44,6 +43,21 @@ module.exports = class Product {
         this.imageURLs = toSet[4];
         this.weight = toSet[5];
         this.sourceURL = toSet[6];
-        this.description = "No description found. Tough luck.";
+        this.description = toSet[7];
+    }
+    check_all(){//about as straightforward as it gets. Check to make sure all values are initialized
+        if(
+            this.id 
+            && this.name 
+            && this.listPrice
+            && this.product_dimension 
+            && this.imageURLs 
+            && this.weight 
+            && this.sourceURL 
+            && this.description
+        ){
+            return true;
+        }
+        return false;
     }
   }

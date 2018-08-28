@@ -1,11 +1,8 @@
 exports.findURL = function(main_address, lineup, search1, search2){
-    var cookies = [];
-    console.log(lineup);
-    console.log(search1);
+    var cookies;
     var coffee = lineup.match(search1);
     var validUrl = require('valid-url');
     if(coffee){
-        //console.log(coffee);
         var tea = [];
         for(var i = 0; i<coffee.length; i++){
             var cappuccino = coffee[i].match(search2);
@@ -17,18 +14,12 @@ exports.findURL = function(main_address, lineup, search1, search2){
             var suspect = tea[i];
             var target = main_address+suspect;
             if (validUrl.isUri(target)){
-               // console.log(target);
-               // console.log('Looks like an URL');
                 cookies.push(target);
-                //console.log(cookies.length);
-            } else {
-                console.log('Not a URL');
             }
         }
     } else {
         console.log("No matches!");
     }
-    console.log(cookies);
     return cookies;
 };
 
@@ -37,7 +28,7 @@ mass_regex = function(id, input, regex_array, source){//execute a series of rege
     for(var i = 1; i<regex_array.length+1; i++){
         var a = input.match(regex_array[i-1]);
         if(a){
-            if(a.constructor === Array){
+            if(a.constructor === Array){//we want to get the first match, not the whole thing.
                 if(a.length == 2){
                     toRet[i] = a[1];
                 }
@@ -71,7 +62,6 @@ exports.getinfo = function(string, source, count){
         /<noscript>\s*<div>\s*<p>([\w|\s|\.|'|\-|,|:|(|)|;|&|;|#|\!|’|<b>|<\/b>||<i>|<\/i><u>|<\/u>|\?|…]+)<\/p>/,
         /<meta name="description" content="([^"]+)"\s+\/>/
     ];
-    //id, name, listprice, description1, description2, product dimension, imageurls, weight, sourceurl
     if(string){
         var set = mass_regex(id, string, regex_array, source);
         var gallery = set[4];
@@ -83,13 +73,14 @@ exports.getinfo = function(string, source, count){
                 }
                 set[4] = imageset;
             }
-        } 
-        //id, name, listprice, description1, description2, product dimension, imageurls, weight, sourceurl
-        test1.set_all(set);
-        var desc = string.match(descrip_regex[2]);
-        if(desc){
-            test1.set_description(desc[1]);
         }
+        var desc;
+        for(var i = 0; i<descrip_regex; i++){//This is different than mass_regex, because we only need one result
+            desc = string.match(descrip_regex[i]);
+            if(desc){break;}
+        }
+        set[7] = desc;
+        test1.set_all(set);
         console.log(JSON.stringify(test1, undefined, 2));
         return test1;
     }

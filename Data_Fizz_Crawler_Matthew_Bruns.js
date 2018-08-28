@@ -1,7 +1,6 @@
-    tester = function(baseweb, filters, count){
+    scraper = function(baseweb, filters, count){
         var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
         var xhttp = new XMLHttpRequest();
-        console.log(baseweb);
         xhttp.open("GET", baseweb);
         xhttp.responseType = "document";
         xhttp.send();
@@ -10,25 +9,21 @@
                 if (xhttp.status === 200) {
                     var parser = require('./parse_functions');
                     var temp = xhttp.responseText;
-                    var result = parser.findURL("https://www.amazon.com", temp, filters[count][0], filters[count][1]);
-                    if(count == 0){
-                        return todo(result);
+                    var result = parser.findURL(baseweb, temp, filters[count][0], filters[count][1]);
+                    if(!result){
+                        console.log('Could not scrape site. Aborting.');
+                        return;
                     }
-                    return tester(result, filters, count-1);
+                    if(count == 0){
+                        console.log('Site scraped. Converting to JSON.');
+                        return site_to_JSON(result, result.length, []);
+                    }
+                    console.log();
+                    return scraper(result, filters, count-1);
                 }
             }
         };
     };
-
-    var sequentialStart = function() {
-        var baseweb = "https://www.amazon.com";
-        var narrow_down = /"[^"]+","url":"[^"]+"/g;
-        var search_for_booksite= /"Books","url":"([^"]+)"/;
-        var search_titles = /<a class="a-link-normal" title="[^"]+" href="[^"]+"/g;
-        var any =  /<a class="a-link-normal" title="[^"]+" href="([^"]+)"/;
-        var filterarray = [[search_titles, any], [narrow_down, search_for_booksite]];
-        tester(baseweb, filterarray, filterarray.length-1);
-    }
 
     site_to_JSON = function(baseweb, count, array){
         var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
@@ -44,7 +39,9 @@
                     var add = parser.getinfo(xhttp.responseText, baseweb[count], count);
                     array[count] = add;
                     if(count == 0){
-                        console.log(JSON.stringify(array, undefined, 2));
+                        var formatter = require('./format_results');
+                        console.log('Formatting...');
+                        formatter.format_products(array);
                         return;
                     }else{
                         return site_to_JSON(baseweb, count, array);
@@ -53,25 +50,27 @@
             }
         };
     };
-
-var fin_array = [];
-todo = function(site_array){
-/*    site_array = [
-        'https://www.amazon.com/Fahrenheit-451-Ray-Bradbury/dp/1451673310/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-        'https://www.amazon.com/Brave-New-World-Aldous-Huxley/dp/0062696122/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-    ]*/
-    var arr = [];
-    site_to_JSON(site_array, site_array.length, arr) ;
+main = function(){
+    var baseweb = process.argv[2];
+    var filterarray;
+    switch(process.argv[3]){
+        case 'books':
+            var narrow_down = /"[^"]+","url":"[^"]+"/g;
+            var search_for_booksite= /"Books","url":"([^"]+)"/;
+            var search_titles = /<a class="a-link-normal" title="[^"]+" href="[^"]+"/g;
+            var any =  /<a class="a-link-normal" title="[^"]+" href="([^"]+)"/;
+            filterarray = [[search_titles, any], [narrow_down, search_for_booksite]];
+            break;
+        default:
+            console.log('No search target.');
+            return;
+    }
+    if(!baseweb | !filterarray){
+        console.log('Invalid arguments.');
+        return;
+    }
+    console.log('Arguments' + process.argv[2] + ' and ' + process.argv[3] + ' accepted.');
+    console.log('Searching ' + process.argv[2] + ' for ' + filterarray);
+    scraper(baseweb, filterarray, filterarray.length-1);
 }
-sequentialStart();
-//todo([
-    /*
-    'https://www.amazon.com/Fahrenheit-451-Ray-Bradbury/dp/1451673310/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-    'https://www.amazon.com/Brave-New-World-Aldous-Huxley/dp/0062696122/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-    'https://www.amazon.com/Kill-Mockingbird-Slipcased-Harper-Lee/dp/0062428551/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-    'https://www.amazon.com/Mice-Penguin-Great-Books-Century/dp/0812416317/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr=',
-    'https://www.amazon.com/Lord-Flies-Penguin-Drop-Caps/dp/0143124293/ref=tmm_hrd_swatch_0?_encoding=UTF8&qid=&sr='
-    */
-    //'https://www.amazon.com/Canticle-Leibowitz-Walter-Miller-Jr/dp/0553273817/ref=tmm_mmp_swatch_0?_encoding=UTF8&qid=&sr='
-    //'https://www.amazon.com/Kill-Mockingbird-Harper-Lee/dp/0060935464/ref=tmm_pap_swatch_0?_encoding=UTF8&qid=&sr='
-//])
+main();
