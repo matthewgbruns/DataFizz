@@ -1,5 +1,6 @@
 module.exports = class Product {
     constructor(){
+        //example product for the purpose of initialization
     this.id = 1,
     this.name = "Sushi at Home: a Mat-To-Table Sushi Cookbook",
     this.listPrice = 17.99,
@@ -9,6 +10,7 @@ module.exports = class Product {
     this.weight = "13.9 oz",
     this.sourceURL = "https://www.amazon.com/gp/product/1623155975/ref=s9_acsd_simh_bw_c_x_1_w?pf_rd_m=ATVPDKIKX0DER&pf_rd_s=merchandised-search-3&pf_rd_r=5S54Z6125KJDKW8DEBTV&pf_rd_r=5S54Z6125KJDKW8DEBTV&pf_rd_t=101&pf_rd_p=fe185ec9-c8f5-44c0-897e-4c0bde93268c&pf_rd_p=fe185ec9-c8f5-44c0-897e-4c0bde93268c&pf_rd_i=283155"
     }
+    //Helper functions if needed
     set_id(toSet){
         this.id = toSet;
     }
