@@ -10,6 +10,7 @@ exports.findURL = function(main_address, lineup, search1, search2){
                 tea.push(cappuccino[1]);
             }
         }
+        cookies = [];
         for(var i = 0; i<tea.length; i++){
             var suspect = tea[i];
             var target = main_address+suspect;
@@ -23,39 +24,37 @@ exports.findURL = function(main_address, lineup, search1, search2){
     return cookies;
 };
 
-mass_regex = function(id, input, regex_array, source){//execute a series of regex on a piece of text
-    var toRet = [id];
-    for(var i = 1; i<regex_array.length+1; i++){
-        var a = input.match(regex_array[i-1]);
-        if(a){
-            if(a.constructor === Array){//we want to get the first match, not the whole thing.
-                if(a.length == 2){
-                    toRet[i] = a[1];
-                }
-                else{
-                    toRet[i] = a;
-                }
-            }
-            else {
-                toRet[i] = a;
-            }
-        } else {
-            toRet[i] = null;
+multi_regex = function(string, regex_set){
+    var str_match;
+    for(var i = 0; i<regex_set.length; i++){
+        match = string.match(regex_set[i]);
+        if(match){
+            str_match = match;
+            break;
         }
     }
-    toRet[toRet.length] = source;
-    return toRet;
+    return str_match;
 }
 
 exports.getinfo = function(string, source, count){
     var Product = require('./pre_struct');
     var test1 = new Product();
     var id = count;
-    var regex_array = [/<span id="productTitle" class="a-size-large">([^<]+)<\/span>/,
-    /<div class="a-fixed-right-grid-col a-col-left" style="padding-right:2\.5%;float:left;">\s*<span class="a-size-small a-color-price">\s*(\$[\d]+\.[\d]+)\s*<\/span>\s*<\/div>\s*<div class="a-fixed-right-grid-col a-col-right" style="width:50px;margin-right:-50px;float:left;">/,
-        /<li><b>\s+Product Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/,
-    /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/,
-    /<li><b>Shipping Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/
+    var regex_array = [
+        [
+            /<span id="productTitle" class="a-size-large">([^<]+)<\/span>/, 
+            /<meta name="title" content="([^":]+)/
+        ],
+        /<div class="a-fixed-right-grid-col a-col-left" style="padding-right:2\.5%;float:left;">\s*<span class="a-size-small a-color-price">\s*(\$[\d]+\.[\d]+)\s*<\/span>\s*<\/div>\s*<div class="a-fixed-right-grid-col a-col-right" style="width:50px;margin-right:-50px;float:left;">/,
+        [
+            /<li><b>\s+Product Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/,
+            /<li><b>\s+Package Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/
+        ],
+        /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/,
+        [
+            /<li><b>Shipping Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/,
+            /<li><b>Package Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/
+        ]
     ];
     var descrip_regex = [
         /<noscript>\s*<div>\s*<p>([\w|\s|\.|'|\-|,|:|(|)|;|&|;|#|\!|’|<b>|<\/b>||<i>|<\/i><u>|<\/u>|\?|…]+)<p>/,
@@ -63,7 +62,16 @@ exports.getinfo = function(string, source, count){
         /<meta name="description" content="([^"]+)"\s+\/>/
     ];
     if(string){
-        var set = mass_regex(id, string, regex_array, source);
+        var set = [];
+        set[0] = id;
+        set[1] = multi_regex(string, regex_array[0]);
+        if(set[1]){set[1] = set[1][1];}
+        set[2] = string.match(regex_array[1]);
+        if(set[2]){set[2] = set[2][1];}
+        set[3] = multi_regex(string, regex_array[2]);
+        set[4] = string.match(regex_array[3]);
+        set[5] = multi_regex(string, regex_array[4]);
+        set[6] = source;
         var gallery = set[4];
         if(gallery){
             var imageset = gallery[0].match(/\{"mainUrl":"([^"]+)","dimensions":\[[^\]]+\],"thumbUrl"/g);
@@ -81,7 +89,7 @@ exports.getinfo = function(string, source, count){
         }
         set[7] = desc;
         test1.set_all(set);
-        console.log(JSON.stringify(test1, undefined, 2));
+        //console.log(JSON.stringify(test1, undefined, 2));
         return test1;
     }
     else{

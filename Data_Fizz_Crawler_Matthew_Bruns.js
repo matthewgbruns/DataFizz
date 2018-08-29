@@ -1,7 +1,8 @@
-    scraper = function(baseweb, filters, count){
+const util = require('util');
+    scraper = function(baseweb, webtoo, filters, count){
         var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", baseweb);
+        xhttp.open("GET", webtoo);
         xhttp.responseType = "document";
         xhttp.send();
         xhttp.onload = function () {
@@ -16,31 +17,40 @@
                     }
                     if(count == 0){
                         console.log('Site scraped. Converting to JSON.');
-                        return site_to_JSON(result, result.length, []);
+                        var formatter = require('./format_results');
+                        console.log('Formatting websites...');
+                        result = formatter.format_websites(result);
+                        if(result){
+                            return site_to_JSON(result, result.length, []);
+                        } else {
+                            console.log('Only got garbage.');
+                        }
                     }
-                    console.log();
-                    return scraper(result, filters, count-1);
+                    console.log('Continuing from ' + result);
+                    return scraper(baseweb, result, filters, count-1);
                 }
             }
         };
     };
 
     site_to_JSON = function(baseweb, count, array){
+        //console.log(count);
         var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
         var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", baseweb[count-1]);
+        count--;
+        xhttp.open("GET", baseweb[count]);
         xhttp.responseType = "document";
         xhttp.send();
         xhttp.onload = function () {
             if (xhttp.readyState === xhttp.DONE) {
                 if (xhttp.status === 200) {
                     var parser = require('./parse_functions');
-                    count--;
                     var add = parser.getinfo(xhttp.responseText, baseweb[count], count);
+                    //console.log(add);
                     array[count] = add;
                     if(count == 0){
                         var formatter = require('./format_results');
-                        console.log('Formatting...');
+                        console.log('Formatting products...');
                         formatter.format_products(array);
                         return;
                     }else{
@@ -69,8 +79,8 @@ main = function(){
         console.log('Invalid arguments.');
         return;
     }
-    console.log('Arguments' + process.argv[2] + ' and ' + process.argv[3] + ' accepted.');
+    console.log('Arguments ' + process.argv[2] + ' and ' + process.argv[3] + ' accepted.');
     console.log('Searching ' + process.argv[2] + ' for ' + filterarray);
-    scraper(baseweb, filterarray, filterarray.length-1);
+    scraper(baseweb, baseweb, filterarray, filterarray.length-1);
 }
 main();

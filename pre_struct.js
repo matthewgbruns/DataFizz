@@ -47,16 +47,30 @@ module.exports = class Product {
     }
     check_all(){//about as straightforward as it gets. Check to make sure all values are initialized
         if(
-            this.id 
-            && this.name 
-            && this.listPrice
-            && this.product_dimension 
-            && this.imageURLs 
-            && this.weight 
-            && this.sourceURL 
-            && this.description
+            this.id === null
+            | this.name === null
+            | this.listPrice === null
+            | this.product_dimension === null
+            | this.imageURLs === null
+            | this.weight === null
+            | this.sourceURL === null
+            | this.description === null
         ){
-            return true;
+            return false;
+        } else {
+        return true;
+        }
+    }
+    doppelganger(that){//check source addresses for duplicate swatches
+        //might as well write the regex out twice
+        var match1 = this.sourceURL.match(/(https:\/\/www\.amazon\.com\/\w+\/\w+\/([a-zA-Z0-9]+))/);
+        if(match1){match1 = match1[1];}
+        var match2 = that.sourceURL.match(/(https:\/\/www\.amazon\.com\/\w+\/\w+\/([a-zA-Z0-9]+))/);
+        if(match2){match2 = match2[1];}
+        if(match1&&match2){
+            if(match1 === match2){
+                return true;
+            }
         }
         return false;
     }
