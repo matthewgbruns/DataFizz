@@ -29,17 +29,17 @@ multi_regex = function(string, regex_set){
     for(var i = 0; i<regex_set.length; i++){
         match = string.match(regex_set[i]);
         if(match){
-            str_match = match;
-            break;
+            return match;
         }
     }
     return str_match;
 };
+//not really worth it- doesn't act the way I intend, but I kept it around just in case
 multi_multi_regex = function(string, reg_arr){
+    //console.log(string);
     var set  = [];
     for(var i = 0; i<reg_arr.size; i++){
         var temp = multi_regex(string, reg_arr[i]);
-        console.log(temp);
         if(temp){set[i] = temp[1];}
     }
     return set;
@@ -62,24 +62,35 @@ exports.getinfo = function(string, source, count){
             /<li><b>\s+Product Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/,
             /<li><b>\s+Package Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/
         ],
-        [
-            /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/
-        ],
+        /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/,
         [
             /<li><b>Shipping Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/,
             /<li><b>Package Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/
+        ],
+        [
+            /<noscript>\s*<div>\s*<p>(.+)<\/div>/,//I gave up trying to add stuff
+            /<meta name="description" content="([^"]+)"\s+\/>/
         ]
-    ];
-    var descrip_regex = [
-        /<noscript>\s*<div>\s*<p>([\w|\s|\.|'|\-|,|:|(|)|;|&|;|#|\!|’|<b>|<\/b>||<i>|<\/i><u>|<\/u>|\?|…]+)<p>/,
-        /<noscript>\s*<div>\s*<p>([\w|\s|\.|'|\-|,|:|(|)|;|&|;|#|\!|’|<b>|<\/b>||<i>|<\/i><u>|<\/u>|\?|…]+)<\/p>/,
-        /<meta name="description" content="([^"]+)"\s+\/>/
-    ];
+    ]; 
     if(string){
         var set = [id];
-        var set2 = multi_multi_regex(string, regex_array);
-        set.push(set2);
+        set[0] = id;
+        //Apparently multi_multi_regex isn't playing along. I'll work on that another time.
+        set[1] = multi_regex(string, regex_array[0]);
+        if(set[1]){set[1] = set[1][1];}
+        set[2] = multi_regex(string, regex_array[1]);
+        if(set[2]){set[2] = set[2][1];}
+        set[3] = multi_regex(string, regex_array[2]);
+        if(set[3]){set[3] = set[3][1];}
+        set[4] = string.match(regex_array[3]);
+        set[5] = multi_regex(string, regex_array[4]);
+        if(set[5]){set[5] = set[5][1];}
         set[6] = source;
+        set[7] = multi_regex(string, regex_array[5]);
+        if(set[7]){
+            var formatter = require('./format_results');
+            set[7] = formatter.format_description(set[7][1]);
+        }
         var gallery = set[4];
         if(gallery){
             var imageset = gallery[0].match(/\{"mainUrl":"([^"]+)","dimensions":\[[^\]]+\],"thumbUrl"/g);
@@ -90,12 +101,6 @@ exports.getinfo = function(string, source, count){
                 set[4] = imageset;
             }
         }
-        var desc;
-        for(var i = 0; i<descrip_regex; i++){//This is different than mass_regex, because we only need one result
-            desc = string.match(descrip_regex[i]);
-            if(desc){break;}
-        }
-        set[7] = desc;
         test1.set_all(set);
         //console.log(JSON.stringify(test1, undefined, 2));
         return test1;
