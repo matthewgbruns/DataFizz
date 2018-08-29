@@ -100,6 +100,11 @@ exports.getinfo = function(string, source, count){
                 }
                 set[4] = imageset;
             }
+        } else {
+            var dynamic = string.match(/data-a-dynamic-image="{&quot;([^&]+)&quot;/);
+            if(dynamic){
+                set[4] = dynamic[1];
+            }
         }
         test1.set_all(set);
         //console.log(JSON.stringify(test1, undefined, 2));

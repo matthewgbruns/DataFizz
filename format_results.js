@@ -18,7 +18,7 @@ exports.format_websites = function(array){
         var match = tocheck.match(/(https:\/\/www\.amazon\.com\/\w+\/\w+\/[a-zA-Z0-9]+)/);
         if(match){//This makes sure we only list values we keep and there are no missing numbers
             final[j] = match[1] + '/ref=tmm_hrd_swatch';
-            final[j+1] = match[1] + '/ref=tmm_pap_swatch';//We want hardcover or paperback only, because digital books don't have 'weight'
+            final[j+1] = match[1] + '/ref=tmm_pap_swatch';//We want hardcover or paperback if we can because digital books don't have 'weight'
             j+=2;
         }
     }
@@ -56,7 +56,7 @@ exports.format_products= function(array){//takes in an array of products and dro
         //console.log(i);
         tocheck = array[i];
         if(tocheck){
-            if(tocheck.check_all()){//This makes sure we only list values we keep and therea re no missing numbers
+            if(tocheck.check_all()){//This makes sure we only list values we keep and there are no missing numbers
                 tocheck.set_id(j);
                 //console.log(tocheck.description);
                 final[j] = tocheck;
