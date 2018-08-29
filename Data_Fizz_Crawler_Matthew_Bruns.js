@@ -60,6 +60,19 @@ const util = require('util');
             }
         };
     };
+partmain = function(){
+    var array = [
+        "https://www.amazon.com/gp/product/0374360979",
+        "https://www.amazon.com/gp/product/B01M14UN1J",
+        "https://www.amazon.com/gp/product/B01FPGY5T0",
+        "https://www.amazon.com/gp/product/B078M5G7XH",
+        "https://www.amazon.com/gp/product/B07C75GRLY"
+    ];
+    console.log("TEST");
+    var formatter = require('./format_results');
+    var result = formatter.format_websites(array);
+    return site_to_JSON(result, result.length, []);
+}
 main = function(){
     var baseweb = process.argv[2];
     var filterarray;
@@ -83,4 +96,4 @@ main = function(){
     console.log('Searching ' + process.argv[2] + ' for ' + filterarray);
     scraper(baseweb, baseweb, filterarray, filterarray.length-1);
 }
-main();
+partmain();

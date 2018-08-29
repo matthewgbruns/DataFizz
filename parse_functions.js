@@ -34,7 +34,16 @@ multi_regex = function(string, regex_set){
         }
     }
     return str_match;
-}
+};
+multi_multi_regex = function(string, reg_arr){
+    var set  = [];
+    for(var i = 0; i<reg_arr.size; i++){
+        var temp = multi_regex(string, reg_arr[i]);
+        console.log(temp);
+        if(temp){set[i] = temp[1];}
+    }
+    return set;
+};
 
 exports.getinfo = function(string, source, count){
     var Product = require('./pre_struct');
@@ -43,14 +52,19 @@ exports.getinfo = function(string, source, count){
     var regex_array = [
         [
             /<span id="productTitle" class="a-size-large">([^<]+)<\/span>/, 
-            /<meta name="title" content="([^":]+)/
+            /<meta name="title" content="([^":]+:[^":]+)/
         ],
-        /<div class="a-fixed-right-grid-col a-col-left" style="padding-right:2\.5%;float:left;">\s*<span class="a-size-small a-color-price">\s*(\$[\d]+\.[\d]+)\s*<\/span>\s*<\/div>\s*<div class="a-fixed-right-grid-col a-col-right" style="width:50px;margin-right:-50px;float:left;">/,
+        [
+            /<div class="a-fixed-right-grid-col a-col-left" style="padding-right:2\.5%;float:left;">\s*<span class="a-size-small a-color-price">\s*(\$[\d]+\.[\d]+)\s*<\/span>\s*<\/div>\s*<div class="a-fixed-right-grid-col a-col-right" style="width:50px;margin-right:-50px;float:left;">/,
+            /<div class="a-fixed-right-grid-col a-col-left" style="padding-right:2\.5%;float:left;">\s*<a class="a-link-normal" href="[^"]+">\s*<span class="a-size-small a-color-price">\s*(\$[\d]+\.[\d]+)\s*<\/span>\s*<\/div>\s*<div class="a-fixed-right-grid-col a-col-right" style="width:50px;margin-right:-50px;float:left;">/
+        ],
         [
             /<li><b>\s+Product Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/,
             /<li><b>\s+Package Dimensions:\s+<\/b>\s+(.+)\s+<\/li>/
         ],
-        /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/,
+        [
+            /imageGalleryData' : \[({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"},)*({"mainUrl":"[^"]+","dimensions":\[[^\]]+\],"thumbUrl":"[^"]+"})\]/
+        ],
         [
             /<li><b>Shipping Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/,
             /<li><b>Package Weight:<\/b>\s+([\d]+[\.]?[\d]{0,2} \w+)/
@@ -62,15 +76,9 @@ exports.getinfo = function(string, source, count){
         /<meta name="description" content="([^"]+)"\s+\/>/
     ];
     if(string){
-        var set = [];
-        set[0] = id;
-        set[1] = multi_regex(string, regex_array[0]);
-        if(set[1]){set[1] = set[1][1];}
-        set[2] = string.match(regex_array[1]);
-        if(set[2]){set[2] = set[2][1];}
-        set[3] = multi_regex(string, regex_array[2]);
-        set[4] = string.match(regex_array[3]);
-        set[5] = multi_regex(string, regex_array[4]);
+        var set = [id];
+        var set2 = multi_multi_regex(string, regex_array);
+        set.push(set2);
         set[6] = source;
         var gallery = set[4];
         if(gallery){
