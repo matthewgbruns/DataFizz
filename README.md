@@ -4,7 +4,9 @@
 
 ## How to Run
 After cloning the project on a computer with NodeJS installed and a working Internet connection, move to its directory. On the command line, one can execute
+
 *node ./Data_Fizz_Crawler_Matthew_Bruns.js https://www.amazon.com books*
+
 The third argument is required to be books for the crawler to function properly, as the code was specialized for this particular instance. As described in EXTENSIONS.txt, there are many angles upon which to expand, such as preparing tables for different websites with appropriate regular expressions packaged for ease of use.
 
 ## General Principle
